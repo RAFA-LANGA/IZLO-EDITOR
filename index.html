@@ -37,7 +37,7 @@
     const titulo = document.getElementById('titulo').value
     const cliente = document.getElementById('cliente').value
     if(!titulo) return alert('Escreve o título!')
-    await supabase.from('editorDigital').insert([{titulo, cliente}])
+    await supabase.from('editordigital').insert([{titulo, cliente}])
     alert('Salvo!')
     carregar()
   }
