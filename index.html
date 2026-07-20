@@ -3,46 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IZLO EDITOR - Web App</title>
+<title>IZLO EDITOR</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  body{font-family:Arial;background:#0f0f0f;color:#fff;padding:20px}
-  .card{background:#1e1e1e;padding:15px;border-radius:10px;margin:10px 0}
-  button{background:#ff0055;color:#fff;border:none;padding:10px 20px;border-radius:5px}
+body{background:#0a0a0a;color:white;font-family:Arial;padding:20px}
+input,textarea,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none}
+button{background:#e50914;color:white;font-weight:bold;cursor:pointer}
+.card{background:#1a1a1a;padding:15px;margin:10px 0;border-radius:10px}
 </style>
 </head>
 <body>
-  <h1>🎬 IZLO EDITOR</h1>
-  <p>App de edição conectado com Supabase!</p>
-  
-  <input id="titulo" placeholder="Título do projeto" style="padding:10px;width:200px">
-  <input id="cliente" placeholder="Nome do cliente" style="padding:10px;width:200px">
-  <button onclick="salvar()">Salvar no Supabase</button>
-
-  <h2>Meus Trabalhos:</h2>
-  <div id="lista">Carregando...</div>
-
+<h1>IZLO EDITOR</h1>
+<input id="titulo" placeholder="Título">
+<textarea id="conteudo" placeholder="Conteúdo"></textarea>
+<button onclick="salvar()">Salvar</button>
+<div id="lista"></div>
 <script>
-  const supabase = window.supabase.createClient(
-    'https://dlybndsqfyjauwbprwni.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRseWJuZHNxZnlqYXV3YnByd25pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjEzMjIsImV4cCI6MjEwMDEzNzMyMn0.ntwR7Z3Dhe9qA5OhSvV42Ee99bf39husHzXunRlBSNo'
-  );
-
-  async function carregar(){
-    const { data } = await supabase.from('editorDigital').select('*').order('created_at',{ascending:false})
-    document.getElementById('lista').innerHTML = data.map(d=>`<div class="card"><b>${d.titulo || 'Sem título'}</b> - ${d.cliente || ''}</div>`).join('') || 'Nenhum trabalho ainda'
-  }
-
-  async function salvar(){
-    const titulo = document.getElementById('titulo').value
-    const cliente = document.getElementById('cliente').value
-    if(!titulo) return alert('Escreve o título!')
-    await supabase.from('editordigital').insert([{titulo, cliente}])
-    alert('Salvo!')
-    carregar()
-  }
-
-  carregar()
+const supabaseUrl = 'https://dlybndsqfyjauwbprwni.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRseWJuZHNxZnlqYXV3YnByd25pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjEzMjIsImV4cCI6MjEwMDEzNzMyMn0.ntwR7Z3Dhe9qA5OhSvV42Ee99bf39husHzXunRlBSNo'
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey)
+async function salvar(){
+  const { error } = await supabaseClient.from('editordigital').insert([{ titulo: titulo.value, conteudo: conteudo.value }])
+  if(error) alert(error.message)
+  else { alert('Salvo!'); titulo.value=''; conteudo.value=''; carregar(); }
+}
+async function carregar(){
+  const { data } = await supabaseClient.from('editordigital').select('*').order('id', {ascending:false})
+  if(data) lista.innerHTML = data.map(i => `<div class="card"><b>${i.titulo}</b><p>${i.conteudo}</p></div>`).join('')
+}
+carregar()
 </script>
 </body>
 </html>
